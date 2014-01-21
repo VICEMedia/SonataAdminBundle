@@ -22,7 +22,7 @@ class PoolTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->pool = new Pool($this->getContainer(), 'Sonata Admin', '/path/to/pic.png');
+        $this->pool = new Pool($this->getContainer(), 'Sonata Admin', '/path/to/pic.png', array('foo'=>'bar'));
     }
 
     public function testGetGroups()
@@ -126,9 +126,32 @@ class PoolTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->pool->getAdminByClass('notexists'));
     }
 
-    public function testGetAdminForClassWhenAdminClassIsSet()
+    /**
+     *
+     * @expectedException \RuntimeException
+     */
+    public function testGetAdminForClassWithInvalidFormat()
     {
         $this->pool->setAdminClasses(array('someclass' => 'sonata.user.admin.group1'));
+        $this->assertTrue($this->pool->hasAdminByClass('someclass'));
+
+        $this->pool->getAdminByClass('someclass');
+    }
+
+    /**
+     *
+     * @expectedException \RuntimeException
+     */
+    public function testGetAdminForClassWithTooManyRegisteredAdmin()
+    {
+        $this->pool->setAdminClasses(array('someclass' => array('sonata.user.admin.group1', 'sonata.user.admin.group2')));
+        $this->assertTrue($this->pool->hasAdminByClass('someclass'));
+        $this->assertEquals('adminUserClass', $this->pool->getAdminByClass('someclass'));
+    }
+
+    public function testGetAdminForClassWhenAdminClassIsSet()
+    {
+        $this->pool->setAdminClasses(array('someclass' => array('sonata.user.admin.group1')));
         $this->assertTrue($this->pool->hasAdminByClass('someclass'));
         $this->assertEquals('adminUserClass', $this->pool->getAdminByClass('someclass'));
     }
@@ -192,6 +215,23 @@ class PoolTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNull($this->pool->getTemplate('bar'));
         $this->assertEquals('Foo.html.twig', $this->pool->getTemplate('ajax'));
+    }
+
+    public function testGetTitleLogo()
+    {
+        $this->assertEquals('/path/to/pic.png', $this->pool->getTitleLogo());
+    }
+
+    public function testGetTitle()
+    {
+        $this->assertEquals('Sonata Admin', $this->pool->getTitle());
+    }
+
+    public function testGetOption()
+    {
+        $this->assertEquals('bar', $this->pool->getOption('foo'));
+
+        $this->assertEquals(null, $this->pool->getOption('non_existent_option'));
     }
 
     /**

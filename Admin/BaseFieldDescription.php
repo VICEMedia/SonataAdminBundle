@@ -33,7 +33,10 @@ use Symfony\Component\DependencyInjection\Container;
  *   - link_parameters (o) : add link parameter to the related Admin class when
  *                           the Admin.generateUrl is called
  *   - code : the method name to retrieve the related value
- *   - associated_tostring : the method to retrieve the "string" representation
+ *   - associated_tostring : (deprecated, use associated_property option)
+ *                           the method to retrieve the "string" representation
+ *                           of the collection element.
+ *   - associated_property : property path to retrieve the "string" representation
  *                           of the collection element.
  *
  * Form Field options :
@@ -202,6 +205,10 @@ abstract class BaseFieldDescription implements FieldDescriptionInterface
             $options['placeholder'] = 'short_object_description_placeholder';
         }
 
+        if (!isset($options['link_parameters'])) {
+            $options['link_parameters'] = array();
+        }
+
         $this->options = $options;
     }
 
@@ -321,16 +328,22 @@ abstract class BaseFieldDescription implements FieldDescriptionInterface
         $camelizedFieldName = self::camelize($fieldName);
 
         $getters = array();
+        $parameters = array();
+        
         // prefer method name given in the code option
         if ($this->getOption('code')) {
             $getters[] = $this->getOption('code');
         }
+        // parameters for the method given in the code option
+        if($this->getOption('parameters')){
+            $parameters = $this->getOption('parameters');
+        }
         $getters[] = 'get' . $camelizedFieldName;
         $getters[] = 'is' . $camelizedFieldName;
-
+        
         foreach ($getters as $getter) {
             if (method_exists($object, $getter)) {
-                return call_user_func(array($object, $getter));
+                return call_user_func_array(array($object, $getter),$parameters);
             }
         }
 
@@ -444,7 +457,7 @@ abstract class BaseFieldDescription implements FieldDescriptionInterface
      */
     public function isSortable()
     {
-        return $this->getOption('sortable', false);
+        return false !== $this->getOption('sortable', false);
     }
 
     /**

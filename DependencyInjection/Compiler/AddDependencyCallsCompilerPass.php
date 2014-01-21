@@ -56,9 +56,14 @@ class AddDependencyCallsCompilerPass implements CompilerPassInterface
                 $arguments = $definition->getArguments();
 
                 $admins[] = $id;
-                $classes[$arguments[1]] = $id;
 
-                $showInDashboard = (boolean) (isset($attributes['show_in_dashboard']) ? $attributes['show_in_dashboard'] : true);
+                if (!isset($classes[$arguments[1]])) {
+                    $classes[$arguments[1]] = array();
+                }
+
+                $classes[$arguments[1]][] = $id;
+
+                $showInDashboard = (boolean) (isset($attributes['show_in_dashboard']) ?  $parameterBag->resolveValue($attributes['show_in_dashboard']) : true);
                 if (!$showInDashboard) {
                     continue;
                 }
@@ -272,7 +277,6 @@ class AddDependencyCallsCompilerPass implements CompilerPassInterface
             'show'                     => 'SonataAdminBundle:CRUD:show.html.twig',
             'edit'                     => 'SonataAdminBundle:CRUD:edit.html.twig',
             'history'                  => 'SonataAdminBundle:CRUD:history.html.twig',
-            'history_revision'         => 'SonataAdminBundle:CRUD:history_revision.html.twig',
             'history_revision_timestamp' => 'SonataAdminBundle:CRUD:history_revision_timestamp.html.twig',
             'acl'                      => 'SonataAdminBundle:CRUD:acl.html.twig',
             'action'                   => 'SonataAdminBundle:CRUD:action.html.twig',

@@ -67,6 +67,9 @@ for it could look like:
 
 .. code-block:: php
 
+   <?php
+   // src/Acme/DemoBundle/Admin/PostAdmin.php
+
    namespace Acme\DemoBundle\Admin;
 
    use Sonata\AdminBundle\Admin\Admin;
@@ -76,7 +79,7 @@ for it could look like:
 
    class PostAdmin extends Admin
    {
-       //Fields to be shown on create/edit forms
+       // Fields to be shown on create/edit forms
        protected function configureFormFields(FormMapper $formMapper)
        {
            $formMapper
@@ -86,7 +89,7 @@ for it could look like:
            ;
        }
 
-       //Fields to be shown on filter forms
+       // Fields to be shown on filter forms
        protected function configureDatagridFilters(DatagridMapper $datagridMapper)
        {
            $datagridMapper
@@ -95,7 +98,7 @@ for it could look like:
            ;
        }
 
-       //Fields to be shown on lists
+       // Fields to be shown on lists
        protected function configureListFields(ListMapper $listMapper)
        {
            $listMapper
@@ -161,7 +164,7 @@ instance based on the class you specified before, and accepts three arguments:
 
     1. The Admin service's code (defaults to the service's name)
     2. The model which this Admin class maps (required)
-    3. The controller that will handle the administration actions (defaults to SoantaAdminBundle:CRUDController)
+    3. The controller that will handle the administration actions (defaults to SonataAdminBundle:CRUDController)
 
 Usually you just need to specify the second argument, as the first and third's default
 values will work for most scenarios.
@@ -197,27 +200,37 @@ file, using the ``load()`` method as described in the `symfony cookbook`_.
     .. code-block:: php
 
         # Acme/DemoBundle/DependencyInjection/AcmeDemoBundleExtension.php for XML configurations
+        
+        namespace Acme\DemoBundle\DependencyInjection;
 
         use Symfony\Component\DependencyInjection\Loader;
         use Symfony\Component\Config\FileLocator;
-
-        public function load(array $configs, ContainerBuilder $container) {
-            // ...
-            $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-            $loader->load('admin.xml');
+        
+        class AcmeDemoBundleExtension extends Extension
+        {
+            public function load(array $configs, ContainerBuilder $container) {
+                // ...
+                $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+                $loader->load('admin.xml');
+            }
         }
 
     .. code-block:: php
 
         # Acme/DemoBundle/DependencyInjection/AcmeDemoBundleExtension.php for YAML configurations
+        
+        namespace Acme\DemoBundle\DependencyInjection;
 
         use Symfony\Component\DependencyInjection\Loader;
         use Symfony\Component\Config\FileLocator;
 
-        public function load(array $configs, ContainerBuilder $container) {
-            // ...
-            $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-            $loader->load('admin.yml');
+        class AcmeDemoBundleExtension extends Extension
+        {
+            public function load(array $configs, ContainerBuilder $container) {
+                // ...
+                $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+                $loader->load('admin.yml');
+            }
         }
 
 Step 4: Configuration
@@ -227,7 +240,16 @@ At this point you have basic administration actions for your model. If you visit
 your model mapped. You can start creating, listing, editing and deleting instances.
 
 You probably want to put your own project's name and logo on the top bar.
-You can do so on your project's main config.yml file:
+
+Put your logo file here ``src/Acme/DemoBundle/Resources/public/img/fancy_acme_logo.png``
+    
+Install your assets:
+
+.. code-block:: sh
+
+    $ php app/console assets:install
+
+Now you can change your project's main config.yml file:
 
 .. configuration-block::
 
@@ -236,7 +258,7 @@ You can do so on your project's main config.yml file:
         # app/config/config.yml
         sonata_admin:
             title:      Acme Demo Bundle
-            title_logo: /bundles/acmedemo/fancy_acme_logo.png
+            title_logo: bundles/acmedemo/img/fancy_acme_logo.png
 
 
 

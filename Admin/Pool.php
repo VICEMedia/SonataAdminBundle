@@ -35,6 +35,7 @@ class Pool
      * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
      * @param string                                                    $title
      * @param string                                                    $logoTitle
+     * @param array                                                     $options
      */
     public function __construct(ContainerInterface $container, $title, $logoTitle, $options = array())
     {
@@ -138,7 +139,15 @@ class Pool
             return null;
         }
 
-        return $this->getInstance($this->adminClasses[$class]);
+        if (!is_array($this->adminClasses[$class])) {
+            throw new \RuntimeException("Invalid format for the Pool::adminClass property");
+        }
+
+        if (count($this->adminClasses[$class]) > 1) {
+            throw new \RuntimeException(sprintf('Unable to found a valid admin for the class: %s, get too many admin registered: %s', $class, implode(",", $this->adminClasses[$class])));
+        }
+
+        return $this->getInstance($this->adminClasses[$class][0]);
     }
 
     /**
